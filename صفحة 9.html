@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>اختبار تفاعلي - Top Phonics Level 1</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=Comic+Neue:wght@700&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pink-accent: #d9468f;
+      --blue-accent: #1d71b8;
+      --yellow-highlight: #ffed4a;
+    }
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(180deg, #dff1ff 0%, #f8fbff 50%, #d8eefc 100%);
+      min-height: 100vh;
+      user-select: none;
+    }
+    .en-font {
+      font-family: 'Fredoka', 'Comic Neue', sans-serif;
+      direction: ltr;
+    }
+    /* Four-line handwriting style */
+    .writing-lines {
+      background-image: linear-gradient(
+        to bottom,
+        #93c5fd 0px, #93c5fd 1.5px,
+        transparent 1.5px, transparent 13px,
+        #60a5fa 13px, #60a5fa 14.5px,
+        transparent 14.5px, transparent 27px,
+        #f87171 27px, #f87171 28.5px,
+        transparent 28.5px, transparent 40px,
+        #93c5fd 40px, #93c5fd 41.5px
+      );
+      height: 44px;
+      line-height: 42px;
+    }
+    /* Hand-drawn circle animation for Q6 */
+    .circle-overlay path {
+      stroke-dasharray: 420;
+      stroke-dashoffset: 420;
+      transition: stroke-dashoffset 0.45s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    .circled .circle-overlay path {
+      stroke-dashoffset: 0;
+    }
+    /* Pulse effect for active anchor in Q5 */
+    @keyframes pulseRing {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(217, 70, 143, 0.6); }
+      70% { transform: scale(1.12); box-shadow: 0 0 0 10px rgba(217, 70, 143, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(217, 70, 143, 0); }
+    }
+    .heart-active {
+      animation: pulseRing 1.2s infinite;
+      background-color: #fce7f3 !important;
+      border-color: #be185d !important;
+    }
+    /* Pencil word bank container */
+    .pencil-box {
+      background: linear-gradient(180deg, #fce7f3 0%, #fbcfe8 50%, #f9a8d4 100%);
+      border: 3px solid #be185d;
+      border-radius: 9999px;
+      position: relative;
+      box-shadow: 0 6px 0 #9d174d, 0 10px 15px rgba(0,0,0,0.08);
+    }
+    .word-chip {
+      transition: all 0.2s ease;
+      text-shadow: 1px 1px 0 #be185d, -1px -1px 0 #be185d, 1px -1px 0 #be185d, -1px 1px 0 #be185d;
+    }
+    .word-chip:hover {
+      transform: translateY(-3px) scale(1.06);
+    }
+    .word-chip.selected-chip {
+      background-color: #fef08a;
+      color: #9d174d !important;
+      text-shadow: none;
+      border-color: #ca8a04;
+      transform: scale(1.1);
+    }
+    .worksheet-card {
+      background: #ffffff;
+      border-radius: 28px;
+      box-shadow: 0 18px 40px rgba(29, 113, 184, 0.14);
+      border: 4px solid #bfdbfe;
+      position: relative;
+      overflow: hidden;
+    }
+    .title-highlight {
+      background: linear-gradient(90deg, #fde047 0%, #facc15 100%);
+      border-radius: 9999px;
+      padding: 4px 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 3px 0 #eab308;
+    }
+    .num-badge {
+      color: #fde047;
+      font-weight: 800;
+      font-size: 1.65rem;
+      -webkit-text-stroke: 2px #b45309;
+      filter: drop-shadow(1px 2px 0px #78350f);
+    }
+  </style>
+</head>
+<body class="py-4 px-2 sm:px-6">
+
+  <!-- Top Control Bar (Arabic Instructions & Score) -->
+  <div class="max-w-4xl mx-auto mb-4 bg-white/95 backdrop-blur border-2 border-sky-300 rounded-2xl p-3 sm:p-4 shadow-md flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 text-white flex items-center justify-center font-extrabold text-xl shadow">
+        9
+      </div>
+      <div>
+        <h1 class="font-extrabold text-slate-800 text-base sm:text-lg">ورقة عمل تفاعلية: عائلة الكلمات (-at)</h1>
+        <p class="text-xs sm:text-sm text-slate-500">نفّذ التمارين (5، 6، 7) ثم اضغط «تحقق من الإجابات»</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+      <div id="scoreBadge" class="hidden bg-emerald-100 border-2 border-emerald-500 text-emerald-800 font-bold px-3.5 py-1.5 rounded-xl text-sm sm:text-base">
+        النتيجة: <span id="scoreValue">0</span> / 10
+      </div>
+      <button onclick="checkAllAnswers()" class="bg-gradient-to-b from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2 rounded-xl shadow-md active:translate-y-0.5 transition flex items-center gap-1.5 text-sm sm:text-base">
+        <span>✅</span>
+        <span>تحقق من الإجابات</span>
+      </button>
+      <button onclick="resetWorksheet()" class="bg-gradient-to-b from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-900 font-bold px-3.5 py-2 rounded-xl shadow-md active:translate-y-0.5 transition flex items-center gap-1.5 text-sm sm:text-base">
+        <span>🔄</span>
+        <span>إعادة</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Worksheet Container -->
+  <div class="max-w-4xl mx-auto worksheet-card p-4 sm:p-8">
+
+    <!-- Top Book Banner -->
+    <div class="flex items-center justify-between mb-6 pb-3 border-b-2 border-dashed border-sky-200 en-font" dir="ltr">
+      <div class="relative inline-block">
+        <div class="bg-pink-600 text-white font-bold text-xs sm:text-sm px-3 py-0.5 rounded-t-lg inline-block -rotate-2 shadow-sm">
+          level 1
+        </div>
+        <div class="bg-yellow-400 border-2 border-amber-500 px-5 py-1.5 rounded-xl shadow-md -mt-1 transform -rotate-1">
+          <span class="text-xl sm:text-2xl font-extrabold tracking-wide text-sky-600" style="-webkit-text-stroke: 1.2px #1e3a8a;">
+            TOP PHONICS
+          </span>
+        </div>
+      </div>
+
+      <!-- Cloud Book Badge -->
+      <div class="bg-sky-50 border-2 border-sky-200 rounded-full px-4 py-1.5 flex items-center gap-2 shadow-sm">
+        <span class="text-2xl">📖</span>
+        <div class="text-left leading-tight">
+          <div class="text-xs font-bold text-pink-600">TOP</div>
+          <div class="text-[11px] font-semibold text-sky-700">Interactive</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- QUESTION 5: Write then match               -->
+    <!-- ========================================== -->
+    <section class="mb-10">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-4" dir="ltr">
+        <div class="title-highlight en-font">
+          <span class="num-badge">5</span>
+          <h2 class="text-lg sm:text-2xl font-extrabold text-sky-800">Write then match:</h2>
+        </div>
+        <div class="flex items-center gap-2" dir="rtl">
+          <span class="text-xs sm:text-sm bg-pink-50 text-pink-800 border border-pink-200 px-3 py-1 rounded-full font-semibold">
+            💡 اكتب الكلمة ثم اسحب أو اضغط على القلب 🩷 لرسم سهم نحو الصورة الصحيحة
+          </span>
+          <button onclick="clearArrowsOnly()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2.5 py-1 rounded-lg border border-slate-300 transition">
+            مسح الأسهم
+          </button>
+        </div>
+      </div>
+
+      <!-- Q5 Interactive Area (LTR layout matching book) -->
+      <div id="q5Container" class="relative bg-sky-50/50 border-2 border-sky-100 rounded-2xl p-3 sm:p-5 en-font" dir="ltr">
+        
+        <!-- SVG Overlay for Arrows -->
+        <svg id="q5Svg" class="absolute inset-0 w-full h-full pointer-events-none z-20" style="overflow: visible;">
+          <defs>
+            <marker id="arrowBlue" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 9 5 L 0 9 z" fill="#2563eb" />
+            </marker>
+            <marker id="arrowGreen" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 9 5 L 0 9 z" fill="#16a34a" />
+            </marker>
+            <marker id="arrowRed" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 9 5 L 0 9 z" fill="#dc2626" />
+            </marker>
+          </defs>
+          <!-- Existing connected lines will be rendered here -->
+          <g id="q5ArrowsGroup"></g>
+          <!-- Temporary dragging line -->
+          <line id="q5TempLine" x1="0" y1="0" x2="0" y2="0" stroke="#db2777" stroke-width="3.5" stroke-dasharray="6,4" marker-end="url(#arrowBlue)" class="hidden" />
+        </svg>
+
+        <div class="grid grid-cols-12 items-center gap-2 sm:gap-4 relative z-10">
+          
+          <!-- Column 1: f, s, m + 'at' cloud (Cols 1-4) -->
+          <div class="col-span-4 sm:col-span-4 flex items-center justify-between relative">
+            <!-- Initial Letters Pill -->
+            <div class="bg-pink-50 border-2 border-pink-400 rounded-full py-2 px-1.5 sm:px-2.5 flex flex-col gap-5 sm:gap-7 shadow-inner">
+              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white border-2 border-pink-500 flex items-center justify-center text-2xl sm:text-3xl font-extrabold text-pink-700 shadow">
+                f
+              </div>
+              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white border-2 border-pink-500 flex items-center justify-center text-2xl sm:text-3xl font-extrabold text-pink-700 shadow">
+                s
+              </div>
+              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white border-2 border-pink-500 flex items-center justify-center text-2xl sm:text-3xl font-extrabold text-pink-700 shadow">
+                m
+              </div>
+            </div>
+
+            <!-- Connector Bracket SVG -->
+            <svg class="w-6 sm:w-12 h-44 text-sky-600 flex-shrink-0" viewBox="0 0 50 180" fill="none">
+              <path d="M0 25 H25 V155 H0" stroke="currentColor" stroke-width="2.5"/>
+              <path d="M0 90 H50" stroke="currentColor" stroke-width="2.5"/>
+            </svg>
+
+            <!-- "at" Cloud -->
+            <div class="relative bg-amber-50 border-2 border-pink-400 rounded-3xl px-3 sm:px-5 py-3 sm:py-4 shadow-md flex-shrink-0">
+              <span class="text-2xl sm:text-4xl font-extrabold text-fuchsia-800">at</span>
+            </div>
+
+            <!-- Right Connector Bracket SVG -->
+            <svg class="w-6 sm:w-10 h-44 text-sky-600 flex-shrink-0" viewBox="0 0 40 180" fill="none">
+              <path d="M0 90 H20 V25 H40" stroke="currentColor" stroke-width="2.5"/>
+              <path d="M20 90 H40" stroke="currentColor" stroke-width="2.5"/>
+              <path d="M20 90 V155 H40" stroke="currentColor" stroke-width="2.5"/>
+            </svg>
+          </div>
+
+          <!-- Column 2: Writing Slots + Left Hearts (Cols 5-8) -->
+          <div class="col-span-5 sm:col-span-4 flex flex-col gap-6 sm:gap-8">
+            <!-- Row 0 -->
+            <div class="flex items-center gap-1.5 sm:gap-2">
+              <div class="relative flex-1">
+                <input id="q5Input0" type="text" value="" autocomplete="off" spellcheck="false" maxlength="3" placeholder="......."
+                  oninput="onQ5InputChange(0)"
+                  class="w-full writing-lines bg-white/90 border-2 border-sky-300 rounded-xl px-2 text-center text-2xl sm:text-3xl font-extrabold text-slate-900 placeholder:text-slate-300 placeholder:tracking-widest focus:outline-none focus:ring-2 focus:ring-sky-400 tracking-wider" />
+              </div>
+              <button id="leftHeart0"
+                onpointerdown="startHeartDrag(event, 0)"
+                onclick="handleLeftHeartClick(0)"
+                class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white border-2 border-pink-400 hover:border-pink-600 flex items-center justify-center text-pink-600 shadow-sm transition cursor-pointer flex-shrink-0"
+                title="اضغط أو اسحب للتوصيل بالصورة">
+                ♡
+              </button>
+            </div>
+
+            <!-- Row 1 -->
+            <div class="flex items-center gap-1.5 sm:gap-2">
+              <div class="relative flex-1">
+                <input id="q5Input1" type="text" value="" autocomplete="off" spellcheck="false" maxlength="3" placeholder="......."
+                  oninput="onQ5InputChange(1)"
+                  class="w-full writing-lines bg-white/90 border-2 border-sky-300 rounded-xl px-2 text-center text-2xl sm:text-3xl font-extrabold text-slate-900 placeholder:text-slate-300 placeholder:tracking-widest focus:outline-none focus:ring-2 focus:ring-sky-400 tracking-wider" />
+              </div>
+              <button id="leftHeart1"
+                onpointerdown="startHeartDrag(event, 1)"
+                onclick="handleLeftHeartClick(1)"
+                class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white border-2 border-pink-400 hover:border-pink-600 flex items-center justify-center text-pink-600 shadow-sm transition cursor-pointer flex-shrink-0"
+                title="اضغط أو اسحب للتوصيل بالصورة">
+                ♡
+              </button>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="flex items-center gap-1.5 sm:gap-2">
+              <div class="relative flex-1">
+                <input id="q5Input2" type="text" value="" autocomplete="off" spellcheck="false" maxlength="3" placeholder="......."
+                  oninput="onQ5InputChange(2)"
+                  class="w-full writing-lines bg-white/90 border-2 border-sky-300 rounded-xl px-2 text-center text-2xl sm:text-3xl font-extrabold text-slate-900 placeholder:text-slate-300 placeholder:tracking-widest focus:outline-none focus:ring-2 focus:ring-sky-400 tracking-wider" />
+              </div>
+              <button id="leftHeart2"
+                onpointerdown="startHeartDrag(event, 2)"
+                onclick="handleLeftHeartClick(2)"
+                class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white border-2 border-pink-400 hover:border-pink-600 flex items-center justify-center text-pink-600 shadow-sm transition cursor-pointer flex-shrink-0"
+                title="اضغط أو اسحب للتوصيل بالصورة">
+                ♡
+              </button>
+            </div>
+          </div>
+
+          <!-- Column 3: Right Hearts + Pictures (Cols 9-12) -->
+          <div class="col-span-3 sm:col-span-4 flex flex-col gap-3 sm:gap-4 items-end">
+            <!-- Target 0: MAT (Rug) -->
+            <div onclick="handleRightHeartClick(0)" data-right-index="0"
+              class="right-target-row flex items-center gap-2 sm:gap-4 cursor-pointer group">
+              <button id="rightHeart0"
+                class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white border-2 border-pink-400 group-hover:border-pink-600 group-hover:scale-110 flex items-center justify-center text-pink-500 shadow-sm transition flex-shrink-0">
+                ♡
+              </button>
+              <div class="w-20 h-16 sm:w-28 sm:h-20 bg-white rounded-2xl border-2 border-pink-200 shadow-sm flex items-center justify-center p-1 group-hover:border-pink-400 transition" id="q5Pic0">
+                <!-- Mat SVG -->
+              </div>
+            </div>
+
+            <!-- Target 1: FAT (Chubby Boy) -->
+            <div onclick="handleRightHeartClick(1)" data-right-index="1"
+              class="right-target-row flex items-center gap-2 sm:gap-4 cursor-pointer group">
+              <button id="rightHeart1"
+                class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white border-2 border-pink-400 group-hover:border-pink-600 group-hover:scale-110 flex items-center justify-center text-pink-500 shadow-sm transition flex-shrink-0">
+                ♡
+              </button>
+              <div class="w-20 h-16 sm:w-28 sm:h-20 bg-white rounded-2xl border-2 border-pink-200 shadow-sm flex items-center justify-center p-1 group-hover:border-pink-400 transition" id="q5Pic1">
+                <!-- Fat Boy SVG -->
+              </div>
+            </div>
+
+            <!-- Target 2: SAT (Boy sitting on chair) -->
+            <div onclick="handleRightHeartClick(2)" data-right-index="2"
+              class="right-target-row flex items-center gap-2 sm:gap-4 cursor-pointer group">
+              <button id="rightHeart2"
+                class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white border-2 border-pink-400 group-hover:border-pink-600 group-hover:scale-110 flex items-center justify-center text-pink-500 shadow-sm transition flex-shrink-0">
+                ♡
+              </button>
+              <div class="w-20 h-16 sm:w-28 sm:h-20 bg-white rounded-2xl border-2 border-pink-200 shadow-sm flex items-center justify-center p-1 group-hover:border-pink-400 transition" id="q5Pic2">
+                <!-- Sat Boy SVG -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- QUESTION 6: Read and circle                -->
+    <!-- ========================================== -->
+    <section class="mb-10">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-4" dir="ltr">
+        <div class="title-highlight en-font">
+          <span class="num-badge">6</span>
+          <h2 class="text-lg sm:text-2xl font-extrabold text-sky-800">Read and circle:</h2>
+        </div>
+        <span class="text-xs sm:text-sm bg-sky-50 text-sky-800 border border-sky-200 px-3 py-1 rounded-full font-semibold" dir="rtl">
+          ⭕ اقرأ الكلمة ثم اضغط على الصورة الصحيحة لوضع دائرة حولها
+        </span>
+      </div>
+
+      <div id="q6Container" class="space-y-4 en-font" dir="ltr">
+        <!-- Populated dynamically by JS -->
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- QUESTION 7: Fill in the blanks             -->
+    <!-- ========================================== -->
+    <section class="mb-4">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-4" dir="ltr">
+        <div class="title-highlight en-font">
+          <span class="num-badge">7</span>
+          <h2 class="text-lg sm:text-2xl font-extrabold text-sky-800">Fill in the blanks:</h2>
+        </div>
+        <span class="text-xs sm:text-sm bg-fuchsia-50 text-fuchsia-800 border border-fuchsia-200 px-3 py-1 rounded-full font-semibold" dir="rtl">
+          ✏️ اختر كلمة من الصندوق الوردي (أو اسحبها) وضعها في الفراغ المناسب
+        </span>
+      </div>
+
+      <!-- Word Bank (Pencil Box) -->
+      <div class="pencil-box px-4 sm:px-8 py-3 mb-6 flex items-center justify-around flex-wrap gap-2 sm:gap-4 en-font" dir="ltr">
+        <button onclick="selectBankWord('cat')" draggable="true" ondragstart="onDragBankWord(event, 'cat')" data-word="cat"
+          class="word-chip text-white font-extrabold text-2xl sm:text-3xl px-4 py-1 rounded-xl border-2 border-transparent cursor-pointer">
+          cat
+        </button>
+        <button onclick="selectBankWord('rat')" draggable="true" ondragstart="onDragBankWord(event, 'rat')" data-word="rat"
+          class="word-chip text-white font-extrabold text-2xl sm:text-3xl px-4 py-1 rounded-xl border-2 border-transparent cursor-pointer">
+          rat
+        </button>
+        <button onclick="selectBankWord('hat')" draggable="true" ondragstart="onDragBankWord(event, 'hat')" data-word="hat"
+          class="word-chip text-white font-extrabold text-2xl sm:text-3xl px-4 py-1 rounded-xl border-2 border-transparent cursor-pointer">
+          hat
+        </button>
+        <button onclick="selectBankWord('bat')" draggable="true" ondragstart="onDragBankWord(event, 'bat')" data-word="bat"
+          class="word-chip text-white font-extrabold text-2xl sm:text-3xl px-4 py-1 rounded-xl border-2 border-transparent cursor-pointer">
+          bat
+        </button>
+        <button onclick="selectBankWord('mat')" draggable="true" ondragstart="onDragBankWord(event, 'mat')" data-word="mat"
+          class="word-chip text-white font-extrabold text-2xl sm:text-3xl px-4 py-1 rounded-xl border-2 border-transparent cursor-pointer">
+          mat
+        </button>
+      </div>
+
+      <!-- Q7 4 Sentences Grid -->
+      <div id="q7Grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 en-font" dir="ltr">
+        <!-- Populated by JS -->
+      </div>
+    </section>
+
+    <!-- Bottom Feedback Message -->
+    <div id="feedbackBanner" class="hidden mt-6 p-4 rounded-2xl border-2 text-center font-bold text-base sm:text-lg transition-all"></div>
+
+  </div>
+
+  <script>
+    // =====================================================
+    // 1. CUSTOM SVG ILLUSTRATIONS (Faithful to the book)
+    // =====================================================
+    const ILLUSTRATIONS = {
+      // Brown/orange decorative angled rug/mat
+      mat: `
+        <svg viewBox="0 0 120 85" class="w-full h-full">
+          <g transform="translate(6, 8)">
+            <path d="M8 45 L2 52 M12 40 L6 47 M16 35 L10 42 M20 30 L14 37 M24 25 L18 32" stroke="#92400e" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M84 48 L92 54 M88 42 L96 48 M92 36 L100 42 M96 30 L104 36 M100 24 L108 30" stroke="#92400e" stroke-width="2.5" stroke-linecap="round"/>
+            <polygon points="28,12 104,24 80,62 6,48" fill="#d97706" stroke="#78350f" stroke-width="3" stroke-linejoin="round"/>
+            <polygon points="32,18 96,28 76,55 14,44" fill="#f59e0b" stroke="#78350f" stroke-width="2"/>
+            <polygon points="55,26 78,36 54,47 32,36" fill="#b45309" stroke="#fef3c7" stroke-width="1.8"/>
+            <circle cx="55" cy="36.5" r="4" fill="#fef3c7"/>
+          </g>
+        </svg>
+      `,
+      // Chubby cartoon boy in red shirt waving ("fat")
+      fat: `
+        <svg viewBox="0 0 110 95" class="w-full h-full">
+          <rect x="38" y="74" width="11" height="14" rx="4" fill="#fed7aa" stroke="#431407" stroke-width="2"/>
+          <rect x="61" y="74" width="11" height="14" rx="4" fill="#fed7aa" stroke="#431407" stroke-width="2"/>
+          <ellipse cx="42" cy="88" rx="8" ry="4" fill="#dc2626" stroke="#431407" stroke-width="2"/>
+          <ellipse cx="67" cy="88" rx="8" ry="4" fill="#dc2626" stroke="#431407" stroke-width="2"/>
+          <path d="M28 45 Q14 35 18 26 Q23 22 28 32 L34 42 Z" fill="#fed7aa" stroke="#431407" stroke-width="2"/>
+          <ellipse cx="83" cy="52" rx="7" ry="12" transform="rotate(-20 83 52)" fill="#fed7aa" stroke="#431407" stroke-width="2"/>
+          <ellipse cx="55" cy="56" rx="28" ry="22" fill="#ef4444" stroke="#431407" stroke-width="2.5"/>
+          <path d="M31 66 Q55 72 79 66 L76 78 L58 78 L55 72 L52 78 L34 78 Z" fill="#1e293b" stroke="#431407" stroke-width="2"/>
+          <circle cx="55" cy="26" r="16" fill="#fed7aa" stroke="#431407" stroke-width="2.5"/>
+          <circle cx="44" cy="29" r="3" fill="#fb7185" opacity="0.6"/>
+          <circle cx="66" cy="29" r="3" fill="#fb7185" opacity="0.6"/>
+          <path d="M40 20 Q45 8 56 10 Q68 10 70 21 Q62 15 55 17 Q46 15 40 20 Z" fill="#1e293b" stroke="#431407" stroke-width="2"/>
+          <circle cx="49" cy="24" r="2" fill="#1e293b"/>
+          <circle cx="61" cy="24" r="2" fill="#1e293b"/>
+          <path d="M49 31 Q55 36 61 31" stroke="#431407" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+      `,
+      // Boy sitting on a chair ("sat")
+      sat: `
+        <svg viewBox="0 0 110 95" class="w-full h-full">
+          <path d="M72 22 V86 M46 58 H74 M48 58 V86" stroke="#78350f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M54 55 H36 V76" stroke="#1e3a8a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <ellipse cx="33" cy="79" rx="7" ry="4" fill="#dc2626" stroke="#1e293b" stroke-width="2"/>
+          <rect x="49" y="34" width="18" height="23" rx="7" fill="#facc15" stroke="#431407" stroke-width="2.2"/>
+          <path d="M56 40 L44 50" stroke="#fed7aa" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="56" cy="21" r="11" fill="#fed7aa" stroke="#431407" stroke-width="2.2"/>
+          <path d="M46 18 Q48 8 60 10 Q67 12 66 20 Q58 14 46 18 Z" fill="#1e293b"/>
+          <circle cx="51" cy="20" r="1.8" fill="#1e293b"/>
+          <path d="M49 25 Q53 28 57 25" stroke="#431407" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        </svg>
+      `,
+      // Pink Hat with blue band & bow ("hat")
+      hat: `
+        <svg viewBox="0 0 120 85" class="w-full h-full">
+          <g transform="rotate(-8 60 45)">
+            <ellipse cx="60" cy="54" rx="46" ry="16" fill="#ec4899" stroke="#831843" stroke-width="2.8"/>
+            <path d="M30 48 Q32 16 60 16 Q88 16 90 48 Z" fill="#f472b6" stroke="#831843" stroke-width="2.8"/>
+            <path d="M30 45 Q60 54 90 45 L89 51 Q60 60 31 51 Z" fill="#38bdf8" stroke="#0369a1" stroke-width="2"/>
+            <ellipse cx="75" cy="47" rx="7" ry="4.5" transform="rotate(-20 75 47)" fill="#0284c7" stroke="#0369a1" stroke-width="1.8"/>
+            <ellipse cx="86" cy="49" rx="7" ry="4.5" transform="rotate(20 86 49)" fill="#38bdf8" stroke="#0369a1" stroke-width="1.8"/>
+            <circle cx="80.5" cy="48" r="3" fill="#0369a1"/>
+          </g>
+        </svg>
+      `,
+      // Cute Orange Striped Cat ("cat")
+      cat: `
+        <svg viewBox="0 0 120 85" class="w-full h-full">
+          <path d="M24 58 Q10 42 18 28 Q24 24 26 34 Q22 44 30 52" fill="#f97316" stroke="#7c2d12" stroke-width="2.5"/>
+          <ellipse cx="56" cy="56" rx="28" ry="17" fill="#fb923c" stroke="#7c2d12" stroke-width="2.5"/>
+          <path d="M42 41 V50 M50 39 V49 M58 40 V50" stroke="#9a3412" stroke-width="3" stroke-linecap="round"/>
+          <ellipse cx="40" cy="70" rx="8" ry="5" fill="#fed7aa" stroke="#7c2d12" stroke-width="2"/>
+          <ellipse cx="72" cy="70" rx="8" ry="5" fill="#fed7aa" stroke="#7c2d12" stroke-width="2"/>
+          <circle cx="76" cy="40" r="18" fill="#fb923c" stroke="#7c2d12" stroke-width="2.5"/>
+          <polygon points="61,28 64,12 73,23" fill="#fb923c" stroke="#7c2d12" stroke-width="2.5" stroke-linejoin="round"/>
+          <polygon points="79,23 89,12 92,28" fill="#fb923c" stroke="#7c2d12" stroke-width="2.5" stroke-linejoin="round"/>
+          <circle cx="70" cy="37" r="2.3" fill="#1e293b"/>
+          <circle cx="83" cy="37" r="2.3" fill="#1e293b"/>
+          <polygon points="76.5,41 73.5,45 79.5,45" fill="#f43f5e"/>
+          <path d="M70 47 Q76.5 51 83 47" stroke="#7c2d12" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M55 41 H65 M55 46 H65 M88 41 H98 M88 46 H98" stroke="#7c2d12" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      `,
+      // Cute Grey Rat holding yellow cheese ("rat")
+      rat: `
+        <svg viewBox="0 0 120 85" class="w-full h-full">
+          <path d="M78 66 Q102 68 104 52 Q105 40 94 44" fill="none" stroke="#f472b6" stroke-width="3.5" stroke-linecap="round"/>
+          <ellipse cx="62" cy="56" rx="20" ry="18" fill="#94a3b8" stroke="#334155" stroke-width="2.5"/>
+          <ellipse cx="58" cy="58" rx="12" ry="12" fill="#cbd5e1"/>
+          <ellipse cx="50" cy="73" rx="7" ry="4" fill="#f472b6" stroke="#334155" stroke-width="2"/>
+          <ellipse cx="70" cy="73" rx="7" ry="4" fill="#f472b6" stroke="#334155" stroke-width="2"/>
+          <circle cx="45" cy="22" r="11" fill="#94a3b8" stroke="#334155" stroke-width="2.5"/>
+          <circle cx="45" cy="22" r="6.5" fill="#f472b6"/>
+          <circle cx="72" cy="22" r="11" fill="#94a3b8" stroke="#334155" stroke-width="2.5"/>
+          <circle cx="72" cy="22" r="6.5" fill="#f472b6"/>
+          <circle cx="58" cy="34" r="15" fill="#94a3b8" stroke="#334155" stroke-width="2.5"/>
+          <circle cx="52" cy="31" r="2.3" fill="#0f172a"/>
+          <circle cx="63" cy="31" r="2.3" fill="#0f172a"/>
+          <circle cx="55" cy="37" r="3" fill="#f43f5e"/>
+          <polygon points="32,50 52,46 48,62 30,60" fill="#facc15" stroke="#b45309" stroke-width="2" stroke-linejoin="round"/>
+          <circle cx="38" cy="54" r="2" fill="#eab308"/>
+          <circle cx="45" cy="56" r="1.6" fill="#eab308"/>
+        </svg>
+      `,
+      // Black Flying Bat ("bat")
+      bat: `
+        <svg viewBox="0 0 120 85" class="w-full h-full">
+          <path d="M48 44 Q26 20 8 34 Q18 44 16 54 Q28 48 34 56 Q42 50 48 54 Z" fill="#1e293b" stroke="#0f172a" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M72 44 Q94 20 112 34 Q102 44 104 54 Q92 48 86 56 Q78 50 72 54 Z" fill="#1e293b" stroke="#0f172a" stroke-width="2.5" stroke-linejoin="round"/>
+          <ellipse cx="60" cy="48" rx="14" ry="15" fill="#334155" stroke="#0f172a" stroke-width="2.5"/>
+          <polygon points="49,36 46,20 56,33" fill="#1e293b" stroke="#0f172a" stroke-width="2.2" stroke-linejoin="round"/>
+          <polygon points="71,36 74,20 64,33" fill="#1e293b" stroke="#0f172a" stroke-width="2.2" stroke-linejoin="round"/>
+          <circle cx="54.5" cy="44" r="4" fill="#ffffff"/>
+          <circle cx="65.5" cy="44" r="4" fill="#ffffff"/>
+          <circle cx="54.5" cy="44" r="2" fill="#0f172a"/>
+          <circle cx="65.5" cy="44" r="2" fill="#0f172a"/>
+          <path d="M54 52 Q60 56 66 52" stroke="#ffffff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        </svg>
+      `
+    };
+
+    // =====================================================
+    // 2. AUDIO DISABLED
+    // =====================================================
+    function speakWord() {
+      // تم إلغاء الصوت بناءً على الطلب
+    }
+
+    // =====================================================
+    // 3. QUESTION 5 STATE & ARROW DRAWING LOGIC
+    // =====================================================
+    // Expected answers for Q5:
+    // Row 0: word = "fat", matches rightIndex = 1 (fat boy)
+    // Row 1: word = "sat", matches rightIndex = 2 (sat boy)
+    // Row 2: word = "mat", matches rightIndex = 0 (mat rug)
+    const Q5_EXPECTED = [
+      { word: 'fat', targetPic: 1 },
+      { word: 'sat', targetPic: 2 },
+      { word: 'mat', targetPic: 0 }
+    ];
+
+    // No pre-filled arrow connections so the student solves all 3 rows
+    let q5Connections = {};
+    let activeLeftHeart = null;
+    let isDraggingHeart = false;
+    let q5CheckStatus = {}; // leftIndex -> boolean
+
+    function initQ5Pictures() {
+      document.getElementById('q5Pic0').innerHTML = ILLUSTRATIONS.mat;
+      document.getElementById('q5Pic1').innerHTML = ILLUSTRATIONS.fat;
+      document.getElementById('q5Pic2').innerHTML = ILLUSTRATIONS.sat;
+      renderQ5Arrows();
+    }
+
+    function onQ5InputChange(rowIdx) {
+      const input = document.getElementById(`q5Input${rowIdx}`);
+      input.classList.remove('ring-2', 'ring-emerald-500', 'ring-rose-500', 'bg-emerald-50', 'bg-rose-50');
+      delete q5CheckStatus[rowIdx];
+      renderQ5Arrows();
+    }
+
+    function selectLeftHeart(leftIdx) {
+      activeLeftHeart = leftIdx;
+      for (let i = 0; i < 3; i++) {
+        const btn = document.getElementById(`leftHeart${i}`);
+        if (i === leftIdx) btn.classList.add('heart-active');
+        else btn.classList.remove('heart-active');
+      }
+    }
+
+    function clearLeftHeartSelection() {
+      activeLeftHeart = null;
+      for (let i = 0; i < 3; i++) {
+        document.getElementById(`leftHeart${i}`).classList.remove('heart-active');
+      }
+    }
+
+    function handleLeftHeartClick(leftIdx) {
+      if (activeLeftHeart === leftIdx) {
+        clearLeftHeartSelection();
+      } else {
+        selectLeftHeart(leftIdx);
+      }
+    }
+
+    function handleRightHeartClick(rightIdx) {
+      const picNames = ['mat', 'fat', 'sat'];
+      speakWord(picNames[rightIdx]);
+      if (activeLeftHeart !== null) {
+        connectQ5(activeLeftHeart, rightIdx);
+        clearLeftHeartSelection();
+      }
+    }
+
+    function connectQ5(leftIdx, rightIdx) {
+      // Remove any existing link pointing to this rightIdx so connections stay 1-to-1
+      Object.keys(q5Connections).forEach(k => {
+        if (q5Connections[k] === rightIdx) delete q5Connections[k];
+      });
+      q5Connections[leftIdx] = rightIdx;
+      delete q5CheckStatus[leftIdx];
+      renderQ5Arrows();
+    }
+
+    function clearArrowsOnly() {
+      q5Connections = {};
+      q5CheckStatus = {};
+      clearLeftHeartSelection();
+      renderQ5Arrows();
+    }
+
+    // Pointer drag support from left hearts to right pictures/hearts
+    function startHeartDrag(e, leftIdx) {
+      selectLeftHeart(leftIdx);
+      isDraggingHeart = true;
+      const container = document.getElementById('q5Container');
+      const rect = container.getBoundingClientRect();
+      const startPt = getCenterRelativeToContainer(document.getElementById(`leftHeart${leftIdx}`), rect);
+
+      const tempLine = document.getElementById('q5TempLine');
+      tempLine.setAttribute('x1', startPt.x);
+      tempLine.setAttribute('y1', startPt.y);
+      tempLine.setAttribute('x2', startPt.x);
+      tempLine.setAttribute('y2', startPt.y);
+      tempLine.classList.remove('hidden');
+
+      const onMove = (moveEvt) => {
+        if (!isDraggingHeart) return;
+        const currentRect = container.getBoundingClientRect();
+        const x = moveEvt.clientX - currentRect.left;
+        const y = moveEvt.clientY - currentRect.top;
+        tempLine.setAttribute('x2', x);
+        tempLine.setAttribute('y2', y);
+      };
+
+      const onUp = (upEvt) => {
+        isDraggingHeart = false;
+        tempLine.classList.add('hidden');
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerup', onUp);
+
+        const el = document.elementFromPoint(upEvt.clientX, upEvt.clientY);
+        const targetRow = el ? el.closest('.right-target-row') : null;
+        if (targetRow) {
+          const rightIdx = parseInt(targetRow.getAttribute('data-right-index'), 10);
+          connectQ5(leftIdx, rightIdx);
+          clearLeftHeartSelection();
+        }
+      };
+
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp);
+    }
+
+    function getCenterRelativeToContainer(el, containerRect) {
+      const r = el.getBoundingClientRect();
+      return {
+        x: r.left - containerRect.left + r.width / 2,
+        y: r.top - containerRect.top + r.height / 2
+      };
+    }
+
+    function renderQ5Arrows() {
+      const container = document.getElementById('q5Container');
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const group = document.getElementById('q5ArrowsGroup');
+      group.innerHTML = '';
+
+      Object.keys(q5Connections).forEach(leftKey => {
+        const leftIdx = parseInt(leftKey, 10);
+        const rightIdx = q5Connections[leftIdx];
+        const leftEl = document.getElementById(`leftHeart${leftIdx}`);
+        const rightEl = document.getElementById(`rightHeart${rightIdx}`);
+        if (!leftEl || !rightEl) return;
+
+        const p1 = getCenterRelativeToContainer(leftEl, rect);
+        const p2 = getCenterRelativeToContainer(rightEl, rect);
+
+        let strokeColor = '#2563eb';
+        let markerId = 'url(#arrowBlue)';
+
+        if (q5CheckStatus[leftIdx] === true) {
+          strokeColor = '#16a34a';
+          markerId = 'url(#arrowGreen)';
+        } else if (q5CheckStatus[leftIdx] === false) {
+          strokeColor = '#dc2626';
+          markerId = 'url(#arrowRed)';
+        }
+
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', p1.x + 6);
+        line.setAttribute('y1', p1.y);
+        line.setAttribute('x2', p2.x - 10);
+        line.setAttribute('y2', p2.y);
+        line.setAttribute('stroke', strokeColor);
+        line.setAttribute('stroke-width', '3.5');
+        line.setAttribute('stroke-linecap', 'round');
+        line.setAttribute('marker-end', markerId);
+        group.appendChild(line);
+      });
+    }
+
+    window.addEventListener('resize', renderQ5Arrows);
+
+    // =====================================================
+    // 4. QUESTION 6: Read and Circle
+    // =====================================================
+    const Q6_DATA = [
+      {
+        letter: 'a',
+        word: 'rat',
+        options: ['hat', 'cat', 'rat'],
+        correctIndex: 2
+      },
+      {
+        letter: 'b',
+        word: 'bat',
+        options: ['bat', 'fat', 'cat'],
+        correctIndex: 0
+      },
+      {
+        letter: 'c',
+        word: 'hat',
+        options: ['cat', 'hat', 'mat'],
+        correctIndex: 1
+      }
+    ];
+
+    let q6Selections = {};
+
+    function renderQ6() {
+      const container = document.getElementById('q6Container');
+      container.innerHTML = Q6_DATA.map((row, rIdx) => `
+        <div class="grid grid-cols-12 items-center gap-3 bg-white rounded-2xl p-2 sm:p-3 border-2 border-pink-200 shadow-sm">
+          <!-- Word & Letter on Left -->
+          <div class="col-span-4 sm:col-span-3 flex items-center gap-2 sm:gap-3 pl-1 sm:pl-3">
+            <span class="w-8 h-8 rounded-full bg-yellow-300 border-2 border-amber-500 flex items-center justify-center font-extrabold text-sky-800 text-lg shadow-sm">
+              ${row.letter}
+            </span>
+            <div class="text-2xl sm:text-4xl font-extrabold text-slate-900 flex items-center gap-1.5">
+              <span>${row.word}</span>
+            </div>
+          </div>
+
+          <!-- 3 Pictures Box on Right -->
+          <div class="col-span-8 sm:col-span-9 grid grid-cols-3 gap-2 sm:gap-4 bg-pink-50/40 rounded-xl p-2 border-t-2 border-pink-300">
+            ${row.options.map((optKey, oIdx) => `
+              <div id="q6Cell_${rIdx}_${oIdx}"
+                onclick="selectQ6Option(${rIdx}, ${oIdx}, '${optKey}')"
+                class="relative h-20 sm:h-24 bg-white rounded-xl border-2 border-slate-100 hover:border-pink-300 flex items-center justify-center p-2 cursor-pointer transition group">
+                <div class="w-24 h-16 sm:w-28 sm:h-20 flex items-center justify-center">
+                  ${ILLUSTRATIONS[optKey]}
+                </div>
+                <!-- Hand-drawn Circle SVG Overlay -->
+                <svg class="circle-overlay absolute inset-0 w-full h-full pointer-events-none p-1" viewBox="0 0 120 90">
+                  <path id="q6CirclePath_${rIdx}_${oIdx}"
+                    d="M 60,8 C 95,8 114,25 114,45 C 114,67 92,82 60,82 C 26,82 6,66 6,45 C 6,22 28,8 65,10"
+                    fill="none" stroke="#e11d48" stroke-width="4.5" stroke-linecap="round" />
+                </svg>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function selectQ6Option(rowIdx, optIdx, wordKey) {
+      speakWord(wordKey);
+      q6Selections[rowIdx] = optIdx;
+      for (let i = 0; i < 3; i++) {
+        const cell = document.getElementById(`q6Cell_${rowIdx}_${i}`);
+        const path = document.getElementById(`q6CirclePath_${rowIdx}_${i}`);
+        cell.classList.remove('bg-emerald-50', 'bg-rose-50', 'border-emerald-400', 'border-rose-400');
+        path.setAttribute('stroke', '#e11d48');
+        if (i === optIdx) {
+          cell.classList.add('circled');
+        } else {
+          cell.classList.remove('circled');
+        }
+      }
+    }
+
+    // =====================================================
+    // 5. QUESTION 7: Fill in the blanks with Word Bank
+    // =====================================================
+    const Q7_DATA = [
+      { id: 0, pic: 'cat', answer: 'cat' },
+      { id: 1, pic: 'mat', answer: 'mat' },
+      { id: 2, pic: 'rat', answer: 'rat' },
+      { id: 3, pic: 'hat', answer: 'hat' }
+    ];
+
+    let selectedWordFromBank = null;
+
+    function renderQ7() {
+      const grid = document.getElementById('q7Grid');
+      grid.innerHTML = Q7_DATA.map((item, idx) => `
+        <div class="flex items-center gap-3 bg-sky-50/60 border-2 border-sky-100 rounded-2xl p-3 shadow-sm">
+          <div class="w-20 h-16 sm:w-24 sm:h-20 bg-white rounded-xl border-2 border-amber-200 p-1 flex-shrink-0">
+            ${ILLUSTRATIONS[item.pic]}
+          </div>
+          <div class="flex items-baseline gap-2 flex-wrap text-xl sm:text-2xl font-extrabold text-slate-900">
+            <span>This is a</span>
+            <input id="q7Input_${idx}"
+              type="text"
+              maxlength="4"
+              placeholder="......."
+              onclick="handleBlankClick(${idx})"
+              oninput="clearQ7Validation(${idx})"
+              ondragover="event.preventDefault()"
+              ondrop="onDropBankWord(event, ${idx})"
+              class="w-24 sm:w-28 text-center font-extrabold text-2xl sm:text-3xl text-pink-700 bg-white border-b-4 border-dotted border-slate-400 focus:border-pink-500 focus:outline-none rounded-lg py-0.5 px-2 transition" />
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function selectBankWord(word) {
+      speakWord(word);
+      if (selectedWordFromBank === word) {
+        selectedWordFromBank = null;
+      } else {
+        selectedWordFromBank = word;
+      }
+      updateWordBankUI();
+    }
+
+    function updateWordBankUI() {
+      document.querySelectorAll('.word-chip').forEach(btn => {
+        if (btn.getAttribute('data-word') === selectedWordFromBank) {
+          btn.classList.add('selected-chip');
+        } else {
+          btn.classList.remove('selected-chip');
+        }
+      });
+    }
+
+    function handleBlankClick(idx) {
+      if (selectedWordFromBank) {
+        const input = document.getElementById(`q7Input_${idx}`);
+        input.value = selectedWordFromBank;
+        clearQ7Validation(idx);
+        selectedWordFromBank = null;
+        updateWordBankUI();
+      }
+    }
+
+    function onDragBankWord(e, word) {
+      e.dataTransfer.setData('text/plain', word);
+    }
+
+    function onDropBankWord(e, idx) {
+      e.preventDefault();
+      const word = e.dataTransfer.getData('text/plain');
+      if (word) {
+        const input = document.getElementById(`q7Input_${idx}`);
+        input.value = word;
+        speakWord(word);
+        clearQ7Validation(idx);
+      }
+    }
+
+    function clearQ7Validation(idx) {
+      const input = document.getElementById(`q7Input_${idx}`);
+      input.classList.remove('bg-emerald-50', 'text-emerald-700', 'border-emerald-500', 'bg-rose-50', 'text-rose-700', 'border-rose-500');
+    }
+
+    // =====================================================
+    // 6. CHECK ANSWERS & RESET WORKSHEET
+    // =====================================================
+    function checkAllAnswers() {
+      let score = 0;
+      const total = 10; // 3 in Q5 + 3 in Q6 + 4 in Q7
+
+      // --- Check Q5 (3 items: word + arrow match) ---
+      for (let i = 0; i < 3; i++) {
+        const input = document.getElementById(`q5Input${i}`);
+        const userWord = input.value.trim().toLowerCase();
+        const wordCorrect = userWord === Q5_EXPECTED[i].word;
+        const arrowCorrect = q5Connections[i] === Q5_EXPECTED[i].targetPic;
+
+        input.classList.remove('ring-2', 'ring-emerald-500', 'ring-rose-500', 'bg-emerald-50', 'bg-rose-50');
+        if (wordCorrect) {
+          input.classList.add('ring-2', 'ring-emerald-500', 'bg-emerald-50');
+        } else {
+          input.classList.add('ring-2', 'ring-rose-500', 'bg-rose-50');
+        }
+
+        q5CheckStatus[i] = arrowCorrect;
+
+        if (wordCorrect && arrowCorrect) {
+          score++;
+        }
+      }
+      renderQ5Arrows();
+
+      // --- Check Q6 (3 items) ---
+      Q6_DATA.forEach((row, rIdx) => {
+        const chosen = q6Selections[rIdx];
+        for (let oIdx = 0; oIdx < 3; oIdx++) {
+          const cell = document.getElementById(`q6Cell_${rIdx}_${oIdx}`);
+          const path = document.getElementById(`q6CirclePath_${rIdx}_${oIdx}`);
+          cell.classList.remove('bg-emerald-50', 'bg-rose-50', 'border-emerald-400', 'border-rose-400');
+
+          if (chosen === oIdx) {
+            if (oIdx === row.correctIndex) {
+              score++;
+              cell.classList.add('bg-emerald-50', 'border-emerald-400');
+              path.setAttribute('stroke', '#16a34a');
+            } else {
+              cell.classList.add('bg-rose-50', 'border-rose-400');
+              path.setAttribute('stroke', '#dc2626');
+            }
+          }
+        }
+      });
+
+      // --- Check Q7 (4 items) ---
+      Q7_DATA.forEach((item, idx) => {
+        const input = document.getElementById(`q7Input_${idx}`);
+        const val = input.value.trim().toLowerCase();
+        clearQ7Validation(idx);
+        if (val === item.answer) {
+          score++;
+          input.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-500');
+        } else {
+          input.classList.add('bg-rose-50', 'text-rose-700', 'border-rose-500');
+        }
+      });
+
+      // Update Top Score Badge & Feedback Banner
+      const scoreBadge = document.getElementById('scoreBadge');
+      const scoreValue = document.getElementById('scoreValue');
+      scoreValue.textContent = score;
+      scoreBadge.classList.remove('hidden');
+
+      const banner = document.getElementById('feedbackBanner');
+      banner.classList.remove('hidden', 'bg-emerald-100', 'border-emerald-400', 'text-emerald-900', 'bg-amber-100', 'border-amber-400', 'text-amber-900');
+
+      if (score === total) {
+        banner.classList.add('bg-emerald-100', 'border-emerald-400', 'text-emerald-900');
+        banner.innerHTML = `🎉 ممتاز يا بطل! حصلت على العلامة الكاملة (${score} من ${total}) 🌟`;
+      } else {
+        banner.classList.add('bg-amber-100', 'border-amber-400', 'text-amber-900');
+        banner.innerHTML = `👏 أحسنت المحاولة! نتيجتك هي (${score} من ${total}). راجع الحقول المحددة باللون الأحمر وحاول مرة أخرى.`;
+      }
+    }
+
+    function resetWorksheet() {
+      // Reset Q5 (All 3 inputs empty & no arrows)
+      for (let i = 0; i < 3; i++) {
+        const input = document.getElementById(`q5Input${i}`);
+        input.value = '';
+        input.classList.remove('ring-2', 'ring-emerald-500', 'ring-rose-500', 'bg-emerald-50', 'bg-rose-50');
+      }
+      q5Connections = {};
+      q5CheckStatus = {};
+      clearLeftHeartSelection();
+      renderQ5Arrows();
+
+      // Reset Q6
+      q6Selections = {};
+      renderQ6();
+
+      // Reset Q7
+      selectedWordFromBank = null;
+      updateWordBankUI();
+      renderQ7();
+
+      // Hide score & banner
+      document.getElementById('scoreBadge').classList.add('hidden');
+      document.getElementById('feedbackBanner').classList.add('hidden');
+    }
+
+    // Initialize everything on load
+    window.onload = function () {
+      initQ5Pictures();
+      resetWorksheet();
+    };
+  </script>
+</body>
+</html>
